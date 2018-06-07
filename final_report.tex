@@ -1,0 +1,123 @@
+% --------------------------------------------------------------
+% This is all preamble stuff that you don't have to worry about.
+% Head down to where it says "Start here"
+% --------------------------------------------------------------
+\documentclass[12pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage{booktabs}
+\usepackage{threeparttable}
+\usepackage{algorithmic, algorithm}
+\usepackage{tikz}
+\usepackage{listings}
+\documentclass{article}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+\lstset{
+basicstyle=\fontsize{11}{13}\selectfont\ttfamily
+}
+\setlength\parindent{0pt}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\usetikzlibrary{arrows, automata}
+\begin{document}
+
+\newenvironment{theorem}[2][Theorem]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{lemma}[2][Lemma]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{exercise}[2][Exercise]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{question}[2][Question]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{reflection}[2][Reflection]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{proposition}[2][Proposition]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+\newenvironment{corollary}[2][Corollary]{\begin{trivlist}
+\item[\hskip \labelsep {\bfseries #1}\hskip \labelsep {\bfseries #2.}]}{\end{trivlist}}
+
+\begin{document}
+
+% --------------------------------------------------------------
+%                         Start here
+% --------------------------------------------------------------
+
+%\renewcommand{\qedsymbol}{\filledbox}
+
+\title{CS325 Final Project Report}%replace X with the appropriate number
+\author{Nathan, Newton, Ziwei} %replace with your name
+ %if necessary, replace with your course title
+\maketitle
+\section*{Research Summary}
+Ants Colony Algorithm is an interesting algorithm that takes inspiration from nature.
+When there is a food source available for ants to forage.
+The ants are able to find the shortest path to the source over time.
+The mechanism is as the follows: at the beginning, each path leads to the food source has an equal
+probability of being traversed by the ants. As ants traverse the path, they leave trails of pheromone.
+As ants find their way back home, the shortest path would allow the ants to return quicker.
+The new patch of ants leaving from the starting point would have a higher probability to traverse the
+path with the higher density of pheromone. Over time, the shortest path would have the highest density of pheromone, and the less often traveled path would have pheromone slowly decayed. 
+Eventually, all ants would only traverse via the shortest path to the food source. This process can be considered as a positive feedback loop. The shortest path is reinforced over time.\\
+Now let's apply this idea to TSP. Given a TSP with n cities and with distance $d_{ij}$. We distribute the ants randomly to each city. Let's assume that ants have memory and can remember what cities they have visited and would not visit them again. The ants would prefer to travel to the closer cities. The probability that a city j selected by ant k after city i is,   
+\begin{align}
+p^k_{ij}=\begin{cases} 
+  \frac { \left[ \tau _ { i j } \right] ^ { \alpha } \cdot \left[ \eta _ { i j } \right] ^ { \beta } } { \sum _ { S \in U} _ { k } \left[ \tau _ { i S } \right] ^ { \alpha } \cdot \left[ \eta _ { i s } \right] ^ { \beta } } &  j \in U_k
+  &
+0 & otherwise \end{cases} 
+\end{align}
+$\tau_{ij}$ is the intensity of pheromone between city $i$ and city $j$. $\alpha$ is the parameter to regulate $\tau_{ij}$. $n_{ij}$ is the closeness factor of the city $i$ from city $j$ and set to $1/d_{ij}$, where $d_{ij}$ is the distance between city $i$ and $j$. $\beta$ is the parameter to regulate $n_{ij}$. $U_k$ is the set of unvisited cities for each ant $k$.\\    
+By intuition, starting with $l$ ants random distributed to each city. After n iterations (n is the number of cities), each ant has completed a tour. The shorter tour would have a higher chance of being traveled by more ants. We need a set of equations to model the pheromone level of each trail between cities as they are being traversed by each ant k.
+\begin{align}
+\tau _ { i j } ( t + 1) = \rho \cdot \tau _ { i j } ( t ) + \Delta \tau _ { i j }
+\end{align}  
+\begin{align}
+\Delta \tau _ { i j } = \sum _ { k = 1} ^ { l } \Delta \tau _ { i j } ^ { k }
+\end{align}  
+\begin{align}
+\Delta \tau _ { i j } ^ { k } = \left\{ \begin{array} { l l } { Q / L _ { k } } & { \text{ if ant } k \text{ travels on edge } ( i ,j ) } \\ { 0} & { \text{ otherwise } } \end{array} \right.
+\end{align}
+Looking at equation 4, the function $Q/L_k$ represents the increase in pheromone level, where Q is a constant and $L_k$ is the length of the tour by ant k from city i and j in one iteration. If no ants traveled the path, the change is zero. Equation 3 represents the total increase of pheromone for a path after taking account of all ants travel through the path after one iteration. Equation 2 is the update function, $\rho \in [0,1]$ is the parameter for regulating the reduction of $\tau_{ij}$. Given the sets of above equations, Let's take a look at the Pseudocode of Ant Colony Algorithm for solving TSP.  
+\section*{Pseudocode}
+Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$ \\
+\begin{enumerate}
+\item  Initialize\\
+   Set time=0\\
+   For every edge(i,j) set an intial $\tau_{ij}=c$ for trail density 
+  and $\delta \tao_{ij}=0$ 
+\item Set s=0 \\
+   For k = 1 to l\\
+   Place ant k on a city randomly. Placed city in $visited_k$. \\
+   Place the group of city in $tabu_k$
+\item Repeat until s $\leq$m\\
+   Set s = s + 1\\
+   For k = 1 to l \\
+   Choose the next city to be visited according to the
+   $p^{k}_{ij}$ by equation 1 \\
+   Move the ant k to the selected city\\
+   Insert the selected city in $visited_k$\\
+   Insert the group of selected city in $tabu_k$
+\item For k = 1 to l\\
+   Move the ant k from $visited_{k}(n)$ to $visited_k(l)$  \\
+   Compute the tour length $L_k$ traveled by ant k \\
+   Update the shorest tour found\\
+   For every edge (i,j)\\
+   For k = 1 to l \\
+   Update $\tau_{ij}$ according to equation 2 to 4
+   time++
+\item If (time < timeMax)\\
+   Empty all $visited_k$ and $tabu_k$\\
+   Goto Step 2\\
+   Else\\
+   Print the shortest tour\\
+   Stop 
+ \end{enumerate}
+\nocite{*}
+\medskip
+\bibliographystyle{unsrt}
+\bibliography{reference} 
+% --------------------------------------------------------------
+%     You don't have to mess with anything below this line.
+% --------------------------------------------------------------
+\end{document}
