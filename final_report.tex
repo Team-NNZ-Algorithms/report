@@ -48,7 +48,7 @@ basicstyle=\fontsize{11}{13}\selectfont\ttfamily
 %\renewcommand{\qedsymbol}{\filledbox}
 
 \title{CS325 Final Project Report}%replace X with the appropriate number
-\author{Nathan Perkins, Eric Newton, Ziwei Wu} %replace with your name
+\author{Nathan Perkins, Eric Newton, Ziwei Wu3} %replace with your name
  %if necessary, replace with your course title
 \maketitle
 \section*{Introduction}
@@ -157,7 +157,7 @@ Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$
    For k = 1 to l \\
    Update $\tau_{ij}$ according to equation 2 to 4\\
    T++
-\item If (T < TMax)\\
+\item If ($T < TMax$)\\
    Empty all $visited_k$ and $tabu_k$\\
    Goto Step 2\\
    Else\\
@@ -182,7 +182,7 @@ There are situations in which swapping a route amongst 4 vertexes cannot fully r
 \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
+\begin{algorithm}[tbh]
    \renewcommand{\thealgorithm}{}
    \caption{TSP(V,E)}
 \begin{algorithmic}
@@ -210,9 +210,54 @@ There are situations in which swapping a route amongst 4 vertexes cannot fully r
   \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
-\section*{Example Results}
-\section*{Competition Results}
+With the algoirthm in place, we are ready to write the implementation to test out the tour cases, we will refere Neartest-Neighbor with 2OPT Optimization as 2-OPT from now on. 
+\section*{Results}
+We implemnted the 2-OPT algorithm using C++. The algorithm itself is fairly straight forward to program. We did spent a big chunk of time creating functions to extract problem from the input files. Using the implementation, we computed the solution for the example cases and competition cases.            
+\subsection*{Example Cases Results}
+\begin{table}[H] %htp makes the table move to the right position
+    \caption{2-OPT for Solving Example Cases}
+    \centering
+\begin{threeparttable}
+  \begin{tabular}{llll}
+\toprule
+Tour & Best Greedy Distance & Duration(seconds) & Approximation Ratio \\
+\midrule
+1&	130921	&	0.002210 & 1.2104\\
+2&	2975	&	0.067972 & 1.1535\\
+3&	1924638 &	63.718613 & 1.2235\\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table}
+The algorithm performed well for the three example cases. Example 1 and 2 only took trivial time to compute, but example 3 did took 63 seconds. All the approximate ratios are in the 1.1 to 1.25 range, which is very close to the optimal solution. Let's take a look at the competition cases  
+
+\subsection*{Competition Cases Results}
+\begin{table}[H] %htp makes the table move to the right position
+    \caption{2-OPT for Solving Competition Cases}
+    \centering
+\begin{threeparttable}
+  \begin{tabular}{llll}
+\toprule
+Tour & Best Greedy Distance & Duration(seconds) & Approximation Ratio \\
+\midrule
+1&	130921	&	0.002210 & 1.2104\\
+2&	2975	&	0.067972 & 1.1535\\
+3&	1924638 &	63.718613 & 1.2235\\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table}
+The algorithm performed well for the three example cases. Example 1 and 2 only took trivial time to compute, but example 3 did took 63 seconds. All the approximate ratios are in the 1.1 to 1.25 range, which is very close to the optimal solution. Let's take a look at the competition cases  
+
+
+
+
+
 \section*{Conclusion}
+
+
+
+
 \nocite{*}
 \medskip
 \bibliographystyle{unsrt}
