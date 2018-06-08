@@ -181,8 +181,7 @@ There are situations in which swapping a route amongst 4 vertexes cannot fully r
   \STATE from route[k+1] to the end of the route to newRoute in order  
 \end{algorithmic}
 \end{algorithm}
-
-\begin{algorithm}[tbh]
+\begin{algorithm}
    \renewcommand{\thealgorithm}{}
    \caption{TSP(V,E)}
 \begin{algorithmic}
@@ -211,10 +210,10 @@ There are situations in which swapping a route amongst 4 vertexes cannot fully r
 \end{algorithmic}
 \end{algorithm}
 With the algoirthm in place, we are ready to write the implementation to test out the tour cases, we will refere Neartest-Neighbor with 2OPT Optimization as 2-OPT from now on. 
-\section*{Results}
+\section*{Results}[t]
 We implemnted the 2-OPT algorithm using C++. The algorithm itself is fairly straight forward to program. We did spent a big chunk of time creating functions to extract problem from the input files. Using the implementation, we computed the solution for the example cases and competition cases.            
 \subsection*{Example Cases Results}
-\begin{table}[H] %htp makes the table move to the right position
+\begin{table} %htp makes the table move to the right position
     \caption{2-OPT for Solving Example Cases}
     \centering
 \begin{threeparttable}
@@ -230,34 +229,32 @@ Tour & Best Greedy Distance & Duration(seconds) & Approximation Ratio \\
 \end{threeparttable}
 \end{table}
 The algorithm performed well for the three example cases. Example 1 and 2 only took trivial time to compute, but example 3 did took 63 seconds. All the approximate ratios are in the 1.1 to 1.25 range, which is very close to the optimal solution. Let's take a look at the competition cases  
-
 \subsection*{Competition Cases Results}
-\begin{table}[H] %htp makes the table move to the right position
+\begin{table} %htp makes the table move to the right position
     \caption{2-OPT for Solving Competition Cases}
     \centering
 \begin{threeparttable}
   \begin{tabular}{llll}
 \toprule
-Tour & Best Greedy Distance & Duration(seconds) & Approximation Ratio \\
+Tour & Distance & Duration(seconds) \\
 \midrule
-1&	130921	&	0.002210 & 1.2104\\
-2&	2975	&	0.067972 & 1.1535\\
-3&	1924638 &	63.718613 & 1.2235\\
+1&	6110	&	0.010000\\
+2&	8618	&	0.040000\\
+3&	15318	&	0.260000\\
+4&	20184	&	1.920000\\
+5&	29342	&	13.04000\\
+6&	41766	&	91.300003\\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
 \end{table}
-The algorithm performed well for the three example cases. Example 1 and 2 only took trivial time to compute, but example 3 did took 63 seconds. All the approximate ratios are in the 1.1 to 1.25 range, which is very close to the optimal solution. Let's take a look at the competition cases  
 
 
 
 
 
 \section*{Conclusion}
-
-
-
-
+TSP is a NP-complete problem which poses a challenge for finding an optimal solution. TSP has applications in many domains including route planning, biology etc. Therefore an approximation algorithm that can provide a close enough apprximation to optimal solution is very valuable. In our research, we investigated three algorithms including Minimum Spannng Tree, Ant Colony, and Nearest-Neighbor 2opt. We chose Nearest-Neighbor 2opt as the algorithm to implemnt due its simple implementation. The algorithm performed very well in both the example and competition cases. All tour were computed within reasonable timeframe and the approximation ratios were all less than 1.25. For our future studies, we would like to investigate more sophistic algorithms that could furthure improve approximation ratio.                    
 \nocite{*}
 \medskip
 \bibliographystyle{unsrt}
