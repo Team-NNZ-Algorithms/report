@@ -51,11 +51,11 @@ basicstyle=\fontsize{11}{13}\selectfont\ttfamily
 \author{Nathan, Newton, Ziwei} %replace with your name
  %if necessary, replace with your course title
 \maketitle
-\section{Introduction}
-The traveling salesman problem or TSP is a classic problem that's been studied in computer science since 1920s. The problem is commonly phrased as the following: A traveling salesman needs to visit a set of cities and make sales. He can only visit each city once and by the end of the trip he needs to make his way back to the start city. If he wants to minimize the total distance travelled, what is the optimal set of paths he should travel. The problem looks simple from the description. But it is a NP-complete problem - a set of problems without polynomial solutions. This means that even given the most powerful computer available, with sufficient large  problem size, the computation for the optimal solution take years.\\\\
-This is where approximation algorithms come into play. If we are not seeking the optimal solution, but a solution that's close enough to the optimal solution. We can employ a polynomial bounded algorithm to compute a suboptimal solution. In this report, we are investigating three approximation algorithms including, and will be choosing one for solving TSP. Let's first take a look of algorithms researched. 
-\section{Algorithms Research}
-\subsection{Minimum Spanning Tree}
+\section*{Introduction}
+The traveling salesman problem or TSP is a classic problem that's been studied in computer science since the 1930s. The problem is commonly phrased as the following: A traveling salesman needs to visit a set of cities and make sales. He can only visit each city once and by the end of the trip he needs to make his way back to the start city. If he wants to minimize the total distance travelled, what is the optimal set of paths he should travel. The problem looks simple from the description. But it is a NP-complete problem - a set of problems without polynomial solutions. This means that even given the most powerful computer available, with sufficient large  problem size, the computation for the optimal solution take years.\\\\
+This is where approximation algorithms come into play. If we are not seeking the optimal solution, but a solution that's close enough to the optimal solution. We can employ a polynomial bounded algorithm to compute a suboptimal solution. In this report, we are investigating three approximation algorithms including MST, Ant Colony Algorithm, and Neartest-Neighbor with 2-OPT optimization. We We first take a look of algorithms researched. 
+\section*{Algorithms Research}
+\subsection*{Minimum Spanning Tree}
 A minimum spanning tree or MST of Graph $G=(V, E)$ is a spannig tree connecting all vertices of V such that the sum of edge's weights are as minimized. It is a polynomial bounded algorithm. Let's see how it can be applied to approximate a solution for TSP, 
 \begin{enumerate}
   \item Find the minimum spanning tree of the citie.
@@ -64,6 +64,7 @@ A minimum spanning tree or MST of Graph $G=(V, E)$ is a spannig tree connecting 
 \end{enumerate}
 The resulting tour is at most most twice length of optimal TSP, however in pratice the results are usually much better, anywhere 15\% to 20\% over optimal solution. There are several ways to find a MST including Prim's algorithm, Kruskal's algorithm, and Boruvka's algorithm. Out of three, Prim's algorithm was chosen due to its simple implementation. Another factor is that with binary heap, it has a runtime of $O(ElogV)$ which is sufficiently fast. Here is the Pseudocode:
 \begin{algorithm}
+   \renewcommand{\thealgorithm}{}
 \caption{Prim's (G(U,V))}
 \begin{algorithmic}
   \FOR {each vertex v in V}
@@ -85,6 +86,7 @@ The resulting tour is at most most twice length of optimal TSP, however in prati
 \end{algorithm}
 The array Q is initialized to contain all of the vertices. Algorithm starts at vertex 0 with a key of 0 as the initial vertex and iterates through each vertex v not yet in the tree choosing the minimum edge weight already in the tree. Thus the adjacent vertex with the minimum edge weight is chosen and vertex v is added to the tree. This continues until Q is empty and all verticies have been added to the MST. We can use the MST graph we’ve produced with Prim’s as input and assume the graph is already connected since we have found the MST. Therefore performing the DFS by visiting each vertex in the graph is simple, pseudocode as follows:  
 \begin{algorithm}
+   \renewcommand{\thealgorithm}{}
   \caption{DFS(G of MST, u)}
 \begin{algorithmic}
   \STATE u.visited = true
@@ -98,7 +100,7 @@ The array Q is initialized to contain all of the vertices. Algorithm starts at v
 \end{algorithmic}
 \end{algorithm}
 Start with some vertex u. We can complete our overall algorithm by adding discovered vertices to queue Q. Q now contains the vertices of the MST in the order they were discovered, which is our solution for TSP. 
-\subsection{Ants Colony Algorithm}
+\subsection*{Ants Colony Algorithm}
 Ants Colony Algorithm is an interesting algorithm that takes inspiration from nature.When there is a food source available for ants to forage.
 The ants are able to find the shortest path to the source over time.
 The mechanism is as the follows: at the beginning, each path leads to the food source has an equal
@@ -127,6 +129,7 @@ By intuition, starting with $l$ ants random distributed to each city. After n it
 \end{align}
 Looking at equation 4, the function $Q/L_k$ represents the increase in pheromone level, where Q is a constant and $L_k$ is the length of the tour by ant k from city i and j in one iteration. If no ants traveled the path, the change is zero. Equation 3 represents the total increase of pheromone for a path after taking account of all ants travel through the path after one iteration. Equation 2 is the update function, $\rho \in [0,1]$ is the regularizing parameter for $\tau_{ij}$. Given the sets of above equations, Let's take a look at the Pseudocode of Ant Colony Algorithm for solving TSP.  
 \begin{algorithm}
+   \renewcommand{\thealgorithm}{}
   \caption{Ant Colony Algorithm}
 Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$ 
 \begin{enumerate}
@@ -163,6 +166,53 @@ Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$
  \end{enumerate}
 \end{algorithm}
 
+\subsection*{Nearest-Neighbor with 2-opt optimmization}
+This is our algorithm of choice for implementing an approximation algorithm. A big reason is that it is a very intuitive and simple algorithm. We were able to grasp the core concepts of algorithm very quickly. It is also fairly straight forward to implement, which allows us to get problems running quicker. The overall algorithm consists of two sub-algorithms, Nearest-Neighbor and 2-opt optimization.\\\\
+The idea of Nearest-Neighbor is that given a Graph G(E,V), we start at vertex $v^0$ and keep going to the nearest, unvisited vertex until all vertice are visited. Finally, we can complete the tour by going back to the first vertex. This is clearly a greedy algorithm, and such that our solution may not be close enough to optimal solution. This is where 2-opt optimization can improve the algorithm.\\\\    
+2-opt is an optimization algorithm that can be run on an approximate solution to improve it iteratively. The main idea is that the algorithm will search for edges in the route that cross over each other and then swap the route amongst 4 vertexes so that they no longer cross. This will always improve the path because a route that contains a cross-over is always longer than the resulting route that removes the cross-over. An optimal solution for TSP will never contain a crossover.\\
+There are situations in which swapping a route amongst 4 vertexes cannot fully remove a crossed path. Similar to double rotations in AVL trees, a single 2-opt swap among 4 vertexes will leave the path crossed with some other vertexes. Then swapping those vertexes might cross it back again. 3-opt is a further improvement that will analyze the path and make double swap as necessary. This can further optimize the route. Here are the pseudocodes.
+\begin{algorithm}
+   \renewcommand{\thealgorithm}{}
+  \caption{2optSwap(path, i, k)}
+\begin{algorithmic}
+  \STATE let newRoute be an empty array
+  \STATE add route[0: i-1] to newRoute in order 
+  \STATE add route[i: k] to newRoute in reverse order 
+  \STATE from route[k+1] to the end of the route to newRoute in order  
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+   \renewcommand{\thealgorithm}{}
+   \caption{TSP(V,E)}
+\begin{algorithmic}
+  \STATE let selected\_V be an empty array 
+  \STATE let path be an empty array 
+  \STATE sort E in descending order of edge weight
+  \WHILE{the length of selected\_V is less than the length of V}
+  \STATE find the next edge in E that doesn't have both connected vertice already selected
+  \STATE add that edge to current path
+  \STATE if either connected vertex is not in selected\_V, add it
+  \ENDWHILE
+  \WHILE{improvements are being made}
+  \STATE improve\_made = false
+  \STATE best\_distance = totalDistance(path)
+  \FOR {i from 1 to number of nodes that can be swapped - 1} 
+  \FOR {k from 1+1 to number of nodes that can be swapped - 1} 
+  \STATE new\_path = 2optSwap(path, i, k)
+  \STATE new\_distance = totalDistance(path)
+  \IF {new\_distance < best\_distance}
+  \STATE path = new\_path
+  \STATE improvement\_made=true
+  \ENDIF
+  \ENDFOR
+  \ENDFOR
+  \ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+\section*{Example Results}
+\section*{Competition Results}
+\section*{Conclusion}
 \nocite{*}
 \medskip
 \bibliographystyle{unsrt}
