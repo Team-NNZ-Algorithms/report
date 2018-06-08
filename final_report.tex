@@ -8,7 +8,8 @@
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage{booktabs}
 \usepackage{threeparttable}
-\usepackage{algorithmic, algorithm}
+\usepackage{algorithm}
+\usepackage{algorithmic}
 \usepackage{tikz}
 \usepackage{listings}
 \documentclass{article}
@@ -50,15 +51,61 @@ basicstyle=\fontsize{11}{13}\selectfont\ttfamily
 \author{Nathan, Newton, Ziwei} %replace with your name
  %if necessary, replace with your course title
 \maketitle
-\section*{Research Summary}
-Ants Colony Algorithm is an interesting algorithm that takes inspiration from nature.
-When there is a food source available for ants to forage.
+\section{Introduction}
+The traveling salesman problem or TSP is a classic problem that's been studied in computer science since 1920s. The problem is commonly phrased as the following: A traveling salesman needs to visit a set of cities and make sales. He can only visit each city once and by the end of the trip he needs to make his way back to the start city. If he wants to minimize the total distance travelled, what is the optimal set of paths he should travel. The problem looks simple from the description. But it is a NP-complete problem - a set of problems without polynomial solutions. This means that even given the most powerful computer available, with sufficient large  problem size, the computation for the optimal solution take years.\\\\
+This is where approximation algorithms come into play. If we are not seeking the optimal solution, but a solution that's close enough to the optimal solution. We can employ a polynomial bounded algorithm to compute a suboptimal solution. In this report, we are investigating three approximation algorithms including, and will be choosing one for solving TSP. Let's first take a look of algorithms researched. 
+\section{Algorithms Research}
+\subsection{Minimum Spanning Tree}
+A minimum spanning tree or MST of Graph $G=(V, E)$ is a spannig tree connecting all vertices of V such that the sum of edge's weights are as minimized. It is a polynomial bounded algorithm. Let's see how it can be applied to approximate a solution for TSP, 
+\begin{enumerate}
+  \item Find the minimum spanning tree of the citie.
+  \item Perform a depth-first search of the resulting tree
+  \item Define the tour by order of vertices being discoverd by DFS
+\end{enumerate}
+The resulting tour is at most most twice length of optimal TSP, however in pratice the results are usually much better, anywhere 15\% to 20\% over optimal solution. There are several ways to find a MST including Prim's algorithm, Kruskal's algorithm, and Boruvka's algorithm. Out of three, Prim's algorithm was chosen due to its simple implementation. Another factor is that with binary heap, it has a runtime of $O(ElogV)$ which is sufficiently fast. Here is the Pseudocode:
+\begin{algorithm}
+\caption{Prim's (G(U,V))}
+\begin{algorithmic}
+  \FOR {each vertex v in V}
+    \STATE $key[v] = \infty$  
+    \STATE $parent[v]=NULL$
+    \STATE insert v into Q 
+  \ENDFOR
+    \STATE $key[0]=0$
+  \WHILE{Q is not empty}
+  \STATE v=Q.removeMin()
+  \FOR{u adjacent to v}
+  \IF{$u \in Q$ and $weight(u,v) < key[u]$}
+  \STATE parent[u]=v
+  \ENDIF
+  \STATE key[v]=weight(u,v)
+  \ENDFOR
+  \ENDWHILE
+\end{algorithmic}
+\end{algorithm}
+The array Q is initialized to contain all of the vertices. Algorithm starts at vertex 0 with a key of 0 as the initial vertex and iterates through each vertex v not yet in the tree choosing the minimum edge weight already in the tree. Thus the adjacent vertex with the minimum edge weight is chosen and vertex v is added to the tree. This continues until Q is empty and all verticies have been added to the MST. We can use the MST graph we’ve produced with Prim’s as input and assume the graph is already connected since we have found the MST. Therefore performing the DFS by visiting each vertex in the graph is simple, pseudocode as follows:  
+\begin{algorithm}
+  \caption{DFS(G of MST, u)}
+\begin{algorithmic}
+  \STATE u.visited = true
+  \STATE ENQUEUE(u)
+  \STATE insert v into Q 
+  \FOR{each $v \in G.Adj[u]$}
+  \IF{!v.visited}
+  \STATE DFS(G,v)
+  \ENDIF
+  \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+Start with some vertex u. We can complete our overall algorithm by adding discovered vertices to queue Q. Q now contains the vertices of the MST in the order they were discovered, which is our solution for TSP. 
+\subsection{Ants Colony Algorithm}
+Ants Colony Algorithm is an interesting algorithm that takes inspiration from nature.When there is a food source available for ants to forage.
 The ants are able to find the shortest path to the source over time.
 The mechanism is as the follows: at the beginning, each path leads to the food source has an equal
 probability of being traversed by the ants. As ants traverse the path, they leave trails of pheromone.
 As ants find their way back home, the shortest path would allow the ants to return quicker.
 The new patch of ants leaving from the starting point would have a higher probability to traverse the
-path with the higher density of pheromone. Over time, the shortest path would have the highest density of pheromone, and the less often traveled path would have pheromone slowly decayed. 
+path with the higher level of pheromone. Over time, the shortest path would have the highest level of pheromone, and the less often traveled path would have pheromone slowly decayed. 
 Eventually, all ants would only traverse via the shortest path to the food source. This process can be considered as a positive feedback loop. The shortest path is reinforced over time.\\
 Now let's apply this idea to TSP. Given a TSP with n cities and with distance $d_{ij}$. We distribute the ants randomly to each city. Let's assume that ants have memory and can remember what cities they have visited and would not visit them again. The ants would prefer to travel to the closer cities. The probability that a city j selected by ant k after city i is,   
 \begin{align}
@@ -78,12 +125,13 @@ By intuition, starting with $l$ ants random distributed to each city. After n it
 \begin{align}
 \Delta \tau _ { i j } ^ { k } = \left\{ \begin{array} { l l } { Q / L _ { k } } & { \text{ if ant } k \text{ travels on edge } ( i ,j ) } \\ { 0} & { \text{ otherwise } } \end{array} \right.
 \end{align}
-Looking at equation 4, the function $Q/L_k$ represents the increase in pheromone level, where Q is a constant and $L_k$ is the length of the tour by ant k from city i and j in one iteration. If no ants traveled the path, the change is zero. Equation 3 represents the total increase of pheromone for a path after taking account of all ants travel through the path after one iteration. Equation 2 is the update function, $\rho \in [0,1]$ is the parameter for regulating the reduction of $\tau_{ij}$. Given the sets of above equations, Let's take a look at the Pseudocode of Ant Colony Algorithm for solving TSP.  
-\section*{Pseudocode}
-Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$ \\
+Looking at equation 4, the function $Q/L_k$ represents the increase in pheromone level, where Q is a constant and $L_k$ is the length of the tour by ant k from city i and j in one iteration. If no ants traveled the path, the change is zero. Equation 3 represents the total increase of pheromone for a path after taking account of all ants travel through the path after one iteration. Equation 2 is the update function, $\rho \in [0,1]$ is the regularizing parameter for $\tau_{ij}$. Given the sets of above equations, Let's take a look at the Pseudocode of Ant Colony Algorithm for solving TSP.  
+\begin{algorithm}
+  \caption{Ant Colony Algorithm}
+Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$ 
 \begin{enumerate}
 \item  Initialize\\
-   Set time=0\\
+   Set T=0\\
    For every edge(i,j) set an intial $\tau_{ij}=c$ for trail density 
   and $\delta \tao_{ij}=0$ 
 \item Set s=0 \\
@@ -104,15 +152,17 @@ Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$ \\
    Update the shorest tour found\\
    For every edge (i,j)\\
    For k = 1 to l \\
-   Update $\tau_{ij}$ according to equation 2 to 4
-   time++
-\item If (time < timeMax)\\
+   Update $\tau_{ij}$ according to equation 2 to 4\\
+   T++
+\item If (T < TMax)\\
    Empty all $visited_k$ and $tabu_k$\\
    Goto Step 2\\
    Else\\
    Print the shortest tour\\
    Stop 
  \end{enumerate}
+\end{algorithm}
+
 \nocite{*}
 \medskip
 \bibliographystyle{unsrt}
