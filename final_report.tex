@@ -22,7 +22,6 @@ basicstyle=\fontsize{11}{13}\selectfont\ttfamily
 \setlength\parindent{0pt}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\Z}{\mathbb{Z}}
-\usetikzlibrary{arrows, automata}
 \begin{document}
 
 \newenvironment{theorem}[2][Theorem]{\begin{trivlist}
@@ -223,37 +222,56 @@ We implemented the 2-OPT algorithm using C++. The algorithm itself is fairly str
 \begin{threeparttable}
   \begin{tabular}{llll}
 \toprule
-Tour & Best Greedy Distance & Total Duration(seconds) & Approximation Ratio \\
+Tour & Best Distance & Total Duration(seconds) & Approximation Ratio \\
 \midrule
-1&	130921	&	0.0251  & 1.2104\\
-2&	2975	  &	0.0357  & 1.1535\\
-3&	1917050 &	66.3062 & 1.2180\\
+1&  112947  & 0.1118  & 1.0442\\
+2&  2741  & 4.4664  & 1.0628\\
+3&  1911863 & 309.7841 & 1.2153\\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
 \end{table}
-2-OPT performed well for the three example cases. Example 1 and 2 only took trivial time to compute. Example 3 took 66 seconds which is a reasonable time. All the approximate ratios are in the 1.15 to 1.22 range, which is very close to the optimal solution. Let's take a look at the competition cases.  
+2-OPT performed well for the three example cases. Example 1 and 2 only took trivial time to compute. Example 3 took 309 seconds. Most of that was the 2-opt iterations, which did not improve the distance much. All the approximate ratios are in the 1.15 to 1.22 range, which is very close to the optimal solution. Let's take a look at the competition cases.  
 \subsection*{Competition Cases}
 \begin{table}[htp] %htp makes the table move to the right position
-    \caption{2-OPT for Solving Competition Cases}
+    \caption{2-OPT for Solving Competition Cases with $<$ 3 minutes}
     \centering
 \begin{threeparttable}
   \begin{tabular}{llll}
 \toprule
-Tour & Best Greedy Distance & Total Duration(seconds) \\
+Tour & Best Distance & Total Duration(seconds) \\
 \midrule
-1&	5911	&	0.0264\\
-2&	8011	&	0.0266\\
-3&	14826	&	0.0500\\
-4&	19711	&	0.1251\\
-5&	27128	&	0.7759\\
-6&	39469	&	3.9298\\
-7&  61466	&	55.0527\\
+1&  5639  & 0.0167\\
+2&  7660  & 0.1731\\
+3&  12724 & 4.5133\\
+4&  17797 & 53.5214\\
+5&  26737 & 50.5503\\
+6&  39116 & 54.2603\\
+7&  61451 & 110.4688\\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
 \end{table}
- 2-OPT algorithm performed well in the competition cases in terms of runtime. All cases were computed in under one minute, and first five cases were under one second. We are confident that it would perform well in terms of approximation ratio based on the example cases. 
+\begin{table}[htp] %htp makes the table move to the right position
+    \caption{2-OPT for Solving Competition Cases with unlimited time}
+    \centering
+\begin{threeparttable}
+  \begin{tabular}{llll}
+\toprule
+Tour & Best Distance & Total Duration(seconds) \\
+\midrule
+1&  5639  & 0.0167\\
+2&  7660  & 0.1731\\
+3&  12724 & 4.5133\\
+4&  17797 & 53.5214\\
+5&  24831 & 600.5212\\
+6&  38580 & 604.176\\
+7&  61190 & 658.2518\\
+\bottomrule
+\end{tabular}
+\end{threeparttable}
+\end{table}
+ 2-OPT algorithm performed well in the competition cases in terms of runtime. All cases were computed in under three minutes, and first three cases were under five seconds. We are confident that it would perform well in terms of approximation ratio based on the example cases. 
 
 \section*{Conclusion}
 TSP is an NP-complete problem which poses a challenge for finding an optimal solution. TSP has applications in many domains including route planning, manufacturing, and biology in DNA sequencing etc. Therefore an approximation algorithm that can provide a close enough approximation to the optimal solution is very valuable. In our research, we investigated three algorithms including Minimum Spanning Tree, Ants Colony algorithm, and Nearest Neighbor with 2-OPT optimization. We chose 2-OPT as the algorithm to implement due to its simple implementation. The algorithm performed very well in both the example and competition cases. All tour were computed within a reasonable timeframe and the approximation ratios were all less than 1.25 for the example cases. For our future studies, we would like to investigate more sophistic algorithms that could further improve approximation ratio.                   
