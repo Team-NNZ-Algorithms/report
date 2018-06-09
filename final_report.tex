@@ -85,7 +85,7 @@ The resulting tour is at most twice the length of optimal TSP. In practice, the 
   \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
-The array Q is initialized to contain all of the vertices. The algorithm starts at vertex 0 with a key of 0 as the initial vertex and iterates through each vertex v not yet in the tree choosing the minimum edge weight already in the tree. Thus the adjacent vertex with the minimum edge weight is chosen and vertex v is added to the tree. This continues until Q is empty and all vertices have been added to the MST. We can use the MST graph we’ve produced with Prim’s as input and assume the graph is already connected since we have found the MST. Therefore performing the DFS by visiting each vertex in the graph is simple, pseudocode as follows:  
+The array Q is initialized to contain all of the vertices. The algorithm starts at vertex 0 with a key of 0 as the initial vertex and iterates through each vertex v not yet in the tree choosing the minimum edge weight already in the tree. Thus the adjacent vertex with the minimum edge weight is chosen and vertex v is added to the tree. This continues until Q is empty and all vertices have been added to the MST. We can use the MST graph we’ve produced with Prim's as input and assume the graph is already connected since we have found the MST. Therefore performing the DFS by visiting each vertex in the graph is simple, pseudocode as follows:  
 \begin{algorithm}
    \renewcommand{\thealgorithm}{}
   \caption{DFS(G of MST, u)}
