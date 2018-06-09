@@ -11,6 +11,7 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{tikz}
+\usepackage{url}
 \usepackage{listings}
 \documentclass{article}
 \usepackage{graphicx}
@@ -48,21 +49,21 @@ basicstyle=\fontsize{11}{13}\selectfont\ttfamily
 %\renewcommand{\qedsymbol}{\filledbox}
 
 \title{CS325 Final Project Report}%replace X with the appropriate number
-\author{Nathan Perkins, Eric Newton, Ziwei Wu3} %replace with your name
+\author{Nathan Perkins, Eric Newton, Ziwei Wu} %replace with your name
  %if necessary, replace with your course title
 \maketitle
 \section*{Introduction}
-The traveling salesman problem or TSP is a classic problem that's been studied in computer science since the 1930s. The problem is commonly phrased as the following: A traveling salesman needs to visit a set of cities and make sales. He can only visit each city once and by the end of the trip he needs to make his way back to the start city. If he wants to minimize the total distance travelled, what is the optimal set of paths he should travel. The problem looks simple from the description. But it is a NP-complete problem - a set of problems without polynomial solutions. This means that even given the most powerful computer available, with sufficient large  problem size, the computation for the optimal solution take years.\\\\
-This is where approximation algorithms come into play. If we are not seeking the optimal solution, but a solution that's close enough to the optimal solution. We can employ a polynomial bounded algorithm to compute a suboptimal solution. In this report, we are investigating three approximation algorithms including MST, Ant Colony Algorithm, and Neartest-Neighbor with 2-OPT optimization. We We first take a look of algorithms researched. 
+The traveling salesman problem or TSP is a classic problem that's been studied in computer science since the 1930s. The problem is commonly phrased as the following: A traveling salesman needs to visit a set of cities and make sales. He can only visit each city once and by the end of the trip, he needs to make his way back to the start city. If he wants to minimize the total distance traveled, what is the optimal set of paths he should travel. The problem looks simple from the description. But it is an NP-complete problem - a set of problems without polynomial solutions. This means that even given the most powerful computer available, with sufficient large problem size, the computation for the optimal solution takes years.\\\\
+This is where approximation algorithms come into play. If we are not seeking the absolute optimal solution, but a solution that's close enough to the optimal solution. We can employ a polynomial bounded algorithm to compute a suboptimal solution. In this report, we are investigating three approximation algorithms including minimum spanning tree, Ant Colony Algorithm, and Nearest-Neighbor with 2-OPT optimization. We first take a look at algorithms researched.       
 \section*{Algorithms Research}
 \subsection*{Minimum Spanning Tree}
-A minimum spanning tree or MST of Graph $G=(V, E)$ is a spannig tree connecting all vertices of V such that the sum of edge's weights are as minimized. It is a polynomial bounded algorithm. Let's see how it can be applied to approximate a solution for TSP, 
+A minimum spanning tree or MST of Graph $G=(V, E)$ is a spanning tree connecting all vertices of V such that the sum of edge's weights is as minimized. It is a polynomial bounded algorithm. Let's see how it can be applied to approximate a solution for TSP, we can break down the overall algorithm into three steps, 
 \begin{enumerate}
-  \item Find the minimum spanning tree of the citie.
-  \item Perform a depth-first search of the resulting tree
-  \item Define the tour by order of vertices being discoverd by DFS
+  \item Find the minimum spanning tree of the cities,
+  \item Perform a depth-first search of the resulting tree,
+  \item Define the tour by order of vertices being discovered by DFS.
 \end{enumerate}
-The resulting tour is at most most twice length of optimal TSP, however in pratice the results are usually much better, anywhere 15\% to 20\% over optimal solution. There are several ways to find a MST including Prim's algorithm, Kruskal's algorithm, and Boruvka's algorithm. Out of three, Prim's algorithm was chosen due to its simple implementation. Another factor is that with binary heap, it has a runtime of $O(ElogV)$ which is sufficiently fast. Here is the Pseudocode:
+The resulting tour is at most twice the length of optimal TSP. In practice, the results are usually much better, anywhere 15\% to 20\% over the optimal solution. There are several ways to find an MST including Prim's algorithm, Kruskal's algorithm, and Boruvka's algorithm. Out of three, Prim's algorithm was chosen due to its simple implementation. Another factor is that with a binary heap, it has a runtime of $O(ElogV)$ which is sufficiently fast. Here is the Pseudocode:
 \begin{algorithm}
    \renewcommand{\thealgorithm}{}
 \caption{Prim's (G(U,V))}
@@ -84,7 +85,7 @@ The resulting tour is at most most twice length of optimal TSP, however in prati
   \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
-The array Q is initialized to contain all of the vertices. Algorithm starts at vertex 0 with a key of 0 as the initial vertex and iterates through each vertex v not yet in the tree choosing the minimum edge weight already in the tree. Thus the adjacent vertex with the minimum edge weight is chosen and vertex v is added to the tree. This continues until Q is empty and all verticies have been added to the MST. We can use the MST graph we’ve produced with Prim’s as input and assume the graph is already connected since we have found the MST. Therefore performing the DFS by visiting each vertex in the graph is simple, pseudocode as follows:  
+The array Q is initialized to contain all of the vertices. The algorithm starts at vertex 0 with a key of 0 as the initial vertex and iterates through each vertex v not yet in the tree choosing the minimum edge weight already in the tree. Thus the adjacent vertex with the minimum edge weight is chosen and vertex v is added to the tree. This continues until Q is empty and all vertices have been added to the MST. We can use the MST graph we’ve produced with Prim’s as input and assume the graph is already connected since we have found the MST. Therefore performing the DFS by visiting each vertex in the graph is simple, pseudocode as follows:  
 \begin{algorithm}
    \renewcommand{\thealgorithm}{}
   \caption{DFS(G of MST, u)}
@@ -101,14 +102,14 @@ The array Q is initialized to contain all of the vertices. Algorithm starts at v
 \end{algorithm}
 Start with some vertex u. We can complete our overall algorithm by adding discovered vertices to queue Q. Q now contains the vertices of the MST in the order they were discovered, which is our solution for TSP. 
 \subsection*{Ants Colony Algorithm}
-Ants Colony Algorithm is an interesting algorithm that takes inspiration from nature.When there is a food source available for ants to forage.
+Ants Colony Algorithm is an interesting algorithm that takes inspiration from nature. When there is a food source available for ants to forage.
 The ants are able to find the shortest path to the source over time.
 The mechanism is as the follows: at the beginning, each path leads to the food source has an equal
 probability of being traversed by the ants. As ants traverse the path, they leave trails of pheromone.
 As ants find their way back home, the shortest path would allow the ants to return quicker.
 The new patch of ants leaving from the starting point would have a higher probability to traverse the
-path with the higher level of pheromone. Over time, the shortest path would have the highest level of pheromone, and the less often traveled path would have pheromone slowly decayed. 
-Eventually, all ants would only traverse via the shortest path to the food source. This process can be considered as a positive feedback loop. The shortest path is reinforced over time.\\
+path with the higher level of pheromone. Over time, the shortest path would have the highest level of pheromone, and the less often traveled path would have pheromone slowly decreasing. 
+Eventually, all ants would only traverse via the shortest path to the food source. This process can be considered as a positive feedback loop. The shortest path is reinforced over time.\\\\
 Now let's apply this idea to TSP. Given a TSP with n cities and with distance $d_{ij}$. We distribute the ants randomly to each city. Let's assume that ants have memory and can remember what cities they have visited and would not visit them again. The ants would prefer to travel to the closer cities. The probability that a city j selected by ant k after city i is,   
 \begin{align}
 p^k_{ij}=\begin{cases} 
@@ -116,7 +117,7 @@ p^k_{ij}=\begin{cases}
   &
 0 & otherwise \end{cases} 
 \end{align}
-$\tau_{ij}$ is the intensity of pheromone between city $i$ and city $j$. $\alpha$ is the parameter to regulate $\tau_{ij}$. $n_{ij}$ is the closeness factor of the city $i$ from city $j$ and set to $1/d_{ij}$, where $d_{ij}$ is the distance between city $i$ and $j$. $\beta$ is the parameter to regulate $n_{ij}$. $U_k$ is the set of unvisited cities for each ant $k$.\\    
+$\tau_{ij}$ is the intensity of pheromone between city $i$ and the city $j$. $\alpha$ is the parameter to regulate $\tau_{ij}$. $n_{ij}$ is the closeness factor of the city $i$ from city $j$ and set to $1/d_{ij}$, where $d_{ij}$ is the distance between city $i$ and $j$. $\beta$ is the parameter to regulate $n_{ij}$. $U_k$ is the set of unvisited cities for each ant $k$.\\\\    
 By intuition, starting with $l$ ants random distributed to each city. After n iterations (n is the number of cities), each ant has completed a tour. The shorter tour would have a higher chance of being traveled by more ants. We need a set of equations to model the pheromone level of each trail between cities as they are being traversed by each ant k.
 \begin{align}
 \tau _ { i j } ( t + 1) = \rho \cdot \tau _ { i j } ( t ) + \Delta \tau _ { i j }
@@ -166,22 +167,24 @@ Let $U_k =\{x|x \in X \text{ and } x \notin G, \exists G \in tabu_k\}$
  \end{enumerate}
 \end{algorithm}
 
-\subsection*{Nearest-Neighbor with 2-opt optimmization}
-This is our algorithm of choice for implementing an approximation algorithm. A big reason is that it is a very intuitive and simple algorithm. We were able to grasp the core concepts of algorithm very quickly. It is also fairly straight forward to implement, which allows us to get problems running quicker. The overall algorithm consists of two sub-algorithms, Nearest-Neighbor and 2-opt optimization.\\\\
-The idea of Nearest-Neighbor is that given a Graph G(E,V), we start at vertex $v^0$ and keep going to the nearest, unvisited vertex until all vertice are visited. Finally, we can complete the tour by going back to the first vertex. This is clearly a greedy algorithm, and such that our solution may not be close enough to optimal solution. This is where 2-opt optimization can improve the algorithm.\\\\    
-2-opt is an optimization algorithm that can be run on an approximate solution to improve it iteratively. The main idea is that the algorithm will search for edges in the route that cross over each other and then swap the route amongst 4 vertexes so that they no longer cross. This will always improve the path because a route that contains a cross-over is always longer than the resulting route that removes the cross-over. An optimal solution for TSP will never contain a crossover.\\
-There are situations in which swapping a route amongst 4 vertexes cannot fully remove a crossed path. Similar to double rotations in AVL trees, a single 2-opt swap among 4 vertexes will leave the path crossed with some other vertexes. Then swapping those vertexes might cross it back again. 3-opt is a further improvement that will analyze the path and make double swap as necessary. This can further optimize the route. Here are the pseudocodes.
-\begin{algorithm}
+\subsection*{Nearest Neighbor with 2-OPT Optimmization}
+\subsubsection*{Rationale for Choosing This Algorithm}
+This is our algorithm of choice for implementing an approximation algorithm. A big reason is that it is a very intuitive and simple algorithm. We were able to grasp the core concepts of algorithm very quickly. It is also fairly straightforward to implement, which allows us to get problems running quicker. The overall algorithm consists of two sub-algorithms, Nearest-Neighbor and 2-OPT optimization.
+\subsubsection*{Algorithm Description}
+The idea of Nearest-Neighbor is that given a Graph G(E,V), we start at vertex $v^0$ and keep going to the nearest, unvisited vertex until all vertice are visited. Finally, we can complete the tour by going back to the first vertex. This is clearly a greedy algorithm, and such that our solution may not be close enough to optimal solution. This is where 2-OPT optimization can improve the algorithm.\\\\    
+2-OPT is an optimization algorithm that can be run on an approximate solution to improve it iteratively. The main idea is that the algorithm will search for edges in the route that cross over each other and then swap the route amongst 4 vertexes so that they no longer cross. This will always improve the path because a route that contains a cross-over is always longer than the resulting route that removes the cross-over. An optimal solution for TSP will never contain a crossover.\\\\
+There are situations in which swapping a route amongst 4 vertexes cannot fully remove a crossed path. Similar to double rotations in AVL trees, a single 2-OPT swap among 4 vertexes will leave the path crossed with some other vertexes. Then swapping those vertexes might cross it back again. 3-OPT is a further improvement that will analyze the path and make double swap as necessary. This can further optimize the route. Here are the pseudocodes.
+\begin{algorithm}[!htb]
    \renewcommand{\thealgorithm}{}
   \caption{2optSwap(path, i, k)}
 \begin{algorithmic}
-  \STATE let newRoute be an empty array
-  \STATE add route[0: i-1] to newRoute in order 
-  \STATE add route[i: k] to newRoute in reverse order 
-  \STATE from route[k+1] to the end of the route to newRoute in order  
+  \STATE Let newRoute be an empty array
+  \STATE Add $route[0: i-1]$ to newRoute in order 
+  \STATE Add $route[i: k]$ to newRoute in reverse order 
+  \STATE From $route[k+1]$ to the end of the route to newRoute in order  
 \end{algorithmic}
 \end{algorithm}
-\begin{algorithm}
+\begin{algorithm}[!htb]
    \renewcommand{\thealgorithm}{}
    \caption{TSP(V,E)}
 \begin{algorithmic}
@@ -200,7 +203,7 @@ There are situations in which swapping a route amongst 4 vertexes cannot fully r
   \FOR {k from 1+1 to number of nodes that can be swapped - 1} 
   \STATE new\_path = 2optSwap(path, i, k)
   \STATE new\_distance = totalDistance(path)
-  \IF {new\_distance < best\_distance}
+  \IF {new\_distance $<$ best\_distance}
   \STATE path = new\_path
   \STATE improvement\_made=true
   \ENDIF
@@ -209,57 +212,57 @@ There are situations in which swapping a route amongst 4 vertexes cannot fully r
   \ENDWHILE
 \end{algorithmic}
 \end{algorithm}
-With the algoirthm in place, we are ready to write the implementation to test out the tour cases, we will refere Neartest-Neighbor with 2OPT Optimization as 2-OPT from now on. 
-\section*{Results}[t]
-We implemnted the 2-OPT algorithm using C++. The algorithm itself is fairly straight forward to program. We did spent a big chunk of time creating functions to extract problem from the input files. Using the implementation, we computed the solution for the example cases and competition cases.            
-\subsection*{Example Cases Results}
-\begin{table} %htp makes the table move to the right position
+With 2-OPT algorithm in place, we are ready to write the implementation to test out the tour cases, we will refer the algorithm as 2-OPT from now on.  
+\subsubsection*{Implementation}
+We implemented the 2-OPT algorithm using C++. The algorithm itself is fairly straightforward to the program. We did spend a big chunk of time creating functions to extract problem from the input files. In terms of data structure, we used vectors to store the adjust edge list and created a struct to represent cities. With the implementation, we computed the solution for the example cases and competition cases.            
+\section*{Results}
+\subsection*{Example Cases}
+\begin{table}[htp] %htp makes the table move to the right position
     \caption{2-OPT for Solving Example Cases}
     \centering
 \begin{threeparttable}
   \begin{tabular}{llll}
 \toprule
-Tour & Best Greedy Distance & Duration(seconds) & Approximation Ratio \\
+Tour & Best Greedy Distance & Total Duration(seconds) & Approximation Ratio \\
 \midrule
-1&	130921	&	0.002210 & 1.2104\\
-2&	2975	&	0.067972 & 1.1535\\
-3&	1924638 &	63.718613 & 1.2235\\
+1&	130921	&	0.0251  & 1.2104\\
+2&	2975	  &	0.0357  & 1.1535\\
+3&	1917050 &	66.3062 & 1.2180\\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
 \end{table}
-The algorithm performed well for the three example cases. Example 1 and 2 only took trivial time to compute, but example 3 did took 63 seconds. All the approximate ratios are in the 1.1 to 1.25 range, which is very close to the optimal solution. Let's take a look at the competition cases  
-\subsection*{Competition Cases Results}
-\begin{table} %htp makes the table move to the right position
+2-OPT performed well for the three example cases. Example 1 and 2 only took trivial time to compute. Example 3 took 66 seconds which is a reasonable time. All the approximate ratios are in the 1.15 to 1.22 range, which is very close to the optimal solution. Let's take a look at the competition cases.  
+\subsection*{Competition Cases}
+\begin{table}[htp] %htp makes the table move to the right position
     \caption{2-OPT for Solving Competition Cases}
     \centering
 \begin{threeparttable}
   \begin{tabular}{llll}
 \toprule
-Tour & Distance & Duration(seconds) \\
+Tour & Best Greedy Distance & Total Duration(seconds) \\
 \midrule
-1&	6110	&	0.010000\\
-2&	8618	&	0.040000\\
-3&	15318	&	0.260000\\
-4&	20184	&	1.920000\\
-5&	29342	&	13.04000\\
-6&	41766	&	91.300003\\
+1&	5911	&	0.0264\\
+2&	8011	&	0.0266\\
+3&	14826	&	0.0500\\
+4&	19711	&	0.1251\\
+5&	27128	&	0.7759\\
+6&	39469	&	3.9298\\
+7&  61466	&	55.0527\\
 \bottomrule
 \end{tabular}
 \end{threeparttable}
 \end{table}
-
-
-
-
+ 2-OPT algorithm performed well in the competition cases in terms of runtime. All cases were computed in under one minute, and first five cases were under one second. We are confident that it would perform well in terms of approximation ratio based on the example cases. 
 
 \section*{Conclusion}
-TSP is a NP-complete problem which poses a challenge for finding an optimal solution. TSP has applications in many domains including route planning, biology etc. Therefore an approximation algorithm that can provide a close enough apprximation to optimal solution is very valuable. In our research, we investigated three algorithms including Minimum Spannng Tree, Ant Colony, and Nearest-Neighbor 2opt. We chose Nearest-Neighbor 2opt as the algorithm to implemnt due its simple implementation. The algorithm performed very well in both the example and competition cases. All tour were computed within reasonable timeframe and the approximation ratios were all less than 1.25. For our future studies, we would like to investigate more sophistic algorithms that could furthure improve approximation ratio.                    
+TSP is an NP-complete problem which poses a challenge for finding an optimal solution. TSP has applications in many domains including route planning, manufacturing, and in biology etc. Therefore an approximation algorithm that can provide a close enough approximation to the optimal solution is very valuable. In our research, we investigated three algorithms including Minimum Spanning Tree, Ant Colony, and Nearest Neighbor with 2-OPT optimization. We chose 2-OPT as the algorithm to implement due to its simple implementation. The algorithm performed very well in both the example and competition cases. All tour were computed within a reasonable timeframe and the approximation ratios were all less than 1.25 for the example cases. For our future studies, we would like to investigate more sophistic algorithms that could further improve approximation ratio.                   
 \nocite{*}
 \medskip
-\bibliographystyle{unsrt}
+\bibliographystyle{plain}
 \bibliography{reference} 
 % --------------------------------------------------------------
 %     You don't have to mess with anything below this line.
 % --------------------------------------------------------------
 \end{document}
+\usepackage{biblatex}
